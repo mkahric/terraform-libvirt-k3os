@@ -11,8 +11,8 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-resource "libvirt_pool" "k3os" {
-  name = "k3os"
+resource "libvirt_pool" "k3os-pool" {
+  name = "k3os-pool"
   type = "dir"
   path = "/srv/libvirt/images"
 }
@@ -20,21 +20,21 @@ resource "libvirt_pool" "k3os" {
 resource "libvirt_volume" "k3os-kernel" {
   name = "k3os-vmlinuz-amd64"
   format = "raw"
-  pool = libvirt_pool.k3os.name
+  pool = libvirt_pool.k3os-pool.name
   source = "https://github.com/rancher/k3os/releases/download/v0.21.5-k3s2r1/k3os-vmlinuz-amd64"
 }
 
 resource "libvirt_volume" "k3os-initrd" {
   name = "k3os-initrd-amd64"
   format = "raw"
-  pool = libvirt_pool.k3os.name
+  pool = libvirt_pool.k3os-pool.name
   source = "https://github.com/rancher/k3os/releases/download/v0.21.5-k3s2r1/k3os-initrd-amd64"
 }
 
 resource "libvirt_volume" "k3os-iso" {
   name = "k3os-amd64.iso"
   format = "iso"
-  pool = libvirt_pool.k3os.name
+  pool = libvirt_pool.k3os-pool.name
   source = "https://github.com/rancher/k3os/releases/download/v0.21.5-k3s2r1/k3os-amd64.iso"
 }
 
@@ -42,16 +42,16 @@ resource "libvirt_volume" "k3os-img" {
   name = "k3os.qcow2"
   size = 4294967296
   format = "qcow2"
-  pool = libvirt_pool.k3os.name
+  pool = libvirt_pool.k3os-pool.name
 }
 resource "libvirt_network" "k3os-net" {
-  name = "k3os"
+  name = "k3os-net"
   mode = "bridge"
   bridge = "br0"
 }
 
 resource "libvirt_domain" "k3os-vm" {
-  name = "k3os"
+  name = "k3os-vm"
   memory = "2048"
   vcpu = 1
   boot_device {
