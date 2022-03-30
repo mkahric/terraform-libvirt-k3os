@@ -1,0 +1,36 @@
+ssh_authorized_keys:
+# $HOME/.ssh/id_ed25519.pub
+- "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAZ3y7eBr2D7kbfXrWYwriJkthWC+4Mn0zaT+tq8NnOQ"
+hostname: k3os-node
+run_cmd:
+# Deploy ingress-nginx
+- "sudo curl -L --retry 3 https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/baremetal/deploy.yaml -o /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml"
+# Deploy hello-caddy
+- "sudo curl -L --retry 3 https://raw.githubusercontent.com/mkahric/k3s-fluxcd-kustomize/main/application/hello-caddy.yaml -o /var/lib/rancher/k3s/server/manifests/hello-caddy.yaml"
+# Deploy FluxCD
+- "sudo curl -L --retry 3 https://github.com/fluxcd/flux2/releases/latest/download/install.yaml -o /var/lib/rancher/k3s/server/manifests/fluxcd.yaml"
+# Deploy FluxCD hello-world source and kustomization
+- "sudo curl -L --retry 3 https://raw.githubusercontent.com/mkahric/k3s-fluxcd-kustomize/main/fluxcd/hello-caddy-source.yaml -o /var/lib/rancher/k3s/server/manifests/hello-caddy-fluxcd-source.yaml"
+- "sudo curl -L --retry 3 https://raw.githubusercontent.com/mkahric/k3s-fluxcd-kustomize/main/fluxcd/hello-caddy-kustomization.yaml -o /var/lib/rancher/k3s/server/manifests/hello-caddy-fluxcd-kustomization.yaml"
+k3os:
+  dns_nameservers:
+  - 1.1.1.1
+  - 9.9.9.9
+  ntp_servers:
+  - 0.europe.pool.ntp.org
+  - 1.europe.pool.ntp.org
+  # openssl passwd -5
+  password: "$5$nIdokdibXrwfF.XR$9/ygeOEhadQ3KVALvdTehWYi72Xzx8uU.kioxmpCW95"
+  # openssl rand -hex 16
+  token: "e0531b004f39bf727f2ba4e89cf62704"
+  k3s_args:
+  - server
+  - "--cluster-init"
+  #- "--disable=traefik"
+  #- "--disable-network-policy"
+  # Configure dual-stack
+  #- "--cluster-cidr=10.20.30.0/23,fd55:123a:321b:30::/64"
+  #- "--service-cidr=10.20.40.0/23,fd55:123a:321b:40::/64"
+  # Configure CIDRs
+  - "--cluster-cidr=10.20.30.0/23"
+  - "--service-cidr=10.20.40.0/23"
